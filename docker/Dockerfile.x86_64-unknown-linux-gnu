@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 as cross-base
+FROM ubuntu:22.04 as cross-base
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY common.sh lib.sh /
@@ -14,16 +14,19 @@ FROM cross-base as build
 
 RUN apt-get update && apt-get install --assume-yes --no-install-recommends \
     g++-x86-64-linux-gnu \
-    gfortran-x86-64-linux-gnu \
-    libc6-dev-amd64-cross
+    libc6-dev-amd64-cross \
+    libglib2.0-dev \
+    libgtk-4-dev \
+    libmount-dev \
+    libudev-dev
 
 COPY deny-debian-packages.sh /
 RUN TARGET_ARCH=amd64 /deny-debian-packages.sh \
     binutils \
     binutils-x86-64-linux-gnu
 
-COPY qemu.sh /
-RUN /qemu.sh x86_64 softmmu
+#COPY qemu.sh /
+#RUN /qemu.sh x86_64 softmmu
 
 COPY dropbear.sh /
 RUN /dropbear.sh
